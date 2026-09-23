@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ReserveTicketView, UserCreateView, UserListView, UserDetailView, EventsView
+from .views import ReserveTicketView, ScanTicketView, UserCreateView, UserListView, UserDetailView, EventsView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -12,6 +12,7 @@ urlpatterns = [
     path("users/register/", UserCreateView.as_view()),
     path("users/<int:pk>/", UserDetailView.as_view()),
     path("events/", EventsView.as_view()),
-    path("events/tickets/", ReserveTicketView.as_view()),
     path("events/<int:event_id>/reserve/", ReserveTicketView.as_view()),
+    path("tickets/", ReserveTicketView.as_view()),
+    path("tickets/scan/", ScanTicketView.as_view())
 ]

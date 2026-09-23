@@ -49,12 +49,7 @@ class TicketSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 class TicketScanRequestSerializer(serializers.Serializer):
-    token = serializers.CharField(required=True)
-
-    def validate_token(self, value):
-        if not Ticket.objects.filter(token_value=value).exists():
-            raise serializers.ValidationError("Invalid ticket , Token not found")
-        return value
+    token_value = serializers.UUIDField(required=True)
 
 
 class TicketScanResponseSerializer(serializers.ModelSerializer):
