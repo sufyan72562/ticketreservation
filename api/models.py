@@ -17,6 +17,12 @@ class Event(models.Model):
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        if self._state.adding:
+            self.available_ticket_count = self.ticket_capicity
+
+        super().save(*args, **kwargs)
+
 
 class Ticket(models.Model):
     ticket_id = models.CharField(unique=True, max_length=100)
