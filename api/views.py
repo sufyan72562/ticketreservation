@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from api.models import Ticket
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -35,11 +36,18 @@ class ReserveTicketView(generics.GenericAPIView):
     serializer_class = TicketSerializer
     permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        user = request.user
+        tickets = Ticket.objects.filter(user=user)
+        serializer = self.get_serializer(tickets, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     def post(self, request, event_id):
         user = request.user
         ticket = TicketService().reserve_ticket(event_id, user)
         serializer = self.get_serializer(ticket)
         data = serializer.data
         return Response(data, status=status.HTTP_201_CREATED)
+    
         
 
