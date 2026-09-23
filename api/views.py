@@ -4,7 +4,8 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from api.serializers import UserSerializer, EventSerializer, TicketSerializer
+from api.serializers import (TicketScanResponseSerializer, UserSerializer,
+                              EventSerializer, TicketSerializer, TicketScanRequestSerializer)
 from api.services import EventService, TicketService
 
 class UserCreateView(generics.CreateAPIView):
@@ -48,6 +49,34 @@ class ReserveTicketView(generics.GenericAPIView):
         serializer = self.get_serializer(ticket)
         data = serializer.data
         return Response(data, status=status.HTTP_201_CREATED)
-    
+
+
+class ScanTicketView(generics.GenericAPIView):
+
+    serializer_class = TicketScanRequestSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+
+        serializer = self.get_serializer(
+            data=request.data
+        )
+
+        serializer.is_valid(raise_exception=True)
+
+        token = serializer.validated_data["token_value"]
+
+        ticket = TicketService().scan_ticket(token)
+
+        response_serializer = TicketScanResponseSerializer(ticket)
+
+        return Response(
+            {
+                "message": "Entry Allowed",
+                "ticket": response_serializer.data
+            },
+            status=status.HTTP_200_OK
+        )
+
         
 

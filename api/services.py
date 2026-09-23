@@ -15,6 +15,7 @@ class EventService:
 
 
 class TicketService:
+
     def reserve_ticket(self, event_id, user):
         with transaction.atomic():
             if not Event.objects.filter(id=event_id).exists():
@@ -34,6 +35,37 @@ class TicketService:
                 user=user,
                 status="BOOKED"
             )
+            return ticket
+
+    
+    def scan_ticket(self, token):
+
+        with transaction.atomic():
+
+            try:
+                ticket = Ticket.objects.select_for_update().select_related("event", "user" ).get(
+                    token_value=token
+                )
+
+            except Ticket.DoesNotExist:
+                raise ValidationError("Invalid ticket")
+
+            if ticket.status == "USED":
+                raise ValidationError(
+                    "Ticket has already used"
+                )
+
+            if ticket.status != "BOOKED":
+                raise ValidationError(
+                    "Ticket is not valid for entry."
+                )
+
+            ticket.status = "USED"
+
+            ticket.save(
+                update_fields=["status"]
+            )
+
             return ticket
         
        

@@ -15,6 +15,12 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
 
+class UserMiniSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["username"]
+
+
 class EventSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -22,6 +28,11 @@ class EventSerializer(serializers.ModelSerializer):
         fields = ["id", "name","event_time",
                    "available_ticket_count", "venue"]
 
+class EventInfoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Event
+        fields = ["id", "name","event_time", "venue"]
 
 class TicketSerializer(serializers.ModelSerializer):
 
@@ -35,7 +46,24 @@ class TicketSerializer(serializers.ModelSerializer):
             "status",
             "token_value",
         ]
-        read_only_fields = [
+        read_only_fields = fields
+
+class TicketScanRequestSerializer(serializers.Serializer):
+    token = serializers.CharField(required=True)
+
+    def validate_token(self, value):
+        if not Ticket.objects.filter(token_value=value).exists():
+            raise serializers.ValidationError("Invalid ticket , Token not found")
+        return value
+
+
+class TicketScanResponseSerializer(serializers.ModelSerializer):
+    event = EventInfoSerializer()
+    user = UserMiniSerializer()
+
+    class Meta:
+        model = Ticket
+        fields = [
             "ticket_id",
             "event",
             "user",
@@ -43,3 +71,4 @@ class TicketSerializer(serializers.ModelSerializer):
             "status",
             "token_value",
         ]
+
