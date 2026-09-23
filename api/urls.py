@@ -12,7 +12,6 @@ urlpatterns = [
     path("users/register/", UserCreateView.as_view()),
     path("users/<int:pk>/", UserDetailView.as_view()),
     path("events/", EventsView.as_view()),
-    path("events/<int:event_id>/reserve/", ReserveTicketView.as_view()),
-    path("tickets/", ReserveTicketView.as_view()),
-    path("tickets/scan/", ScanTicketView.as_view())
+    path("tickets/<int:event_id>/reserve/", ReserveTicketView.as_view(), name="reserve-ticket"),
+    path("tickets/scan/", ScanTicketView.as_view(), name="scan-ticket")
 ]
